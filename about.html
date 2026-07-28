@@ -17,11 +17,27 @@
             line-height: 1.6;
             background-color: #f5f5f0;
             color: #1a1a1a;
+            overflow-x: hidden;
+        }
+        
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            display: block;
+            pointer-events: none;
+        }
+        
+        .content-wrapper {
+            position: relative;
+            z-index: 2;
             padding: 60px 40px;
             max-width: 900px;
             margin: 0 auto;
-            background-image: radial-gradient(circle, #d0d0d0 0.5px, transparent 0.5px);
-            background-size: 30px 30px;
+            min-height: 100vh;
         }
         
         .back-link {
@@ -32,7 +48,7 @@
         .back-link a {
             color: #1a1a1a;
             text-decoration: none;
-            border-bottom: none;
+            border-bottom: 1px solid #1a1a1a;
         }
         
         .back-link a:hover {
@@ -51,6 +67,7 @@
             padding: 40px;
             margin-bottom: 40px;
             line-height: 1.8;
+            background-color: rgba(245, 245, 240, 0.95);
         }
         
         .content-box p {
@@ -67,7 +84,7 @@
         }
         
         .contact-section {
-            border-top: 2px dashed #333;
+            border-top: 2px dashed #888;
             padding-top: 20px;
             margin-top: 20px;
         }
@@ -89,7 +106,7 @@
         .contact-item a {
             color: #1a1a1a;
             text-decoration: none;
-            border-bottom: none;
+            border-bottom: 1px solid #1a1a1a;
         }
         
         .contact-item a:hover {
@@ -106,7 +123,7 @@
         }
         
         @media (max-width: 600px) {
-            body {
+            .content-wrapper {
                 padding: 40px 20px;
             }
             
@@ -121,38 +138,225 @@
     </style>
 </head>
 <body>
-    <div class="back-link">
-        <a href="index.html">← back</a>
-    </div>
+    <canvas id="canvas"></canvas>
     
-    <h1>About me</h1>
-    
-    <div class="content-box">
-        <h>>Hi! My name is Brandon. </h>
+    <div class="content-wrapper">
+        <div class="back-link">
+            <a href="index.html">← back</a>
+        </div>
         
-        <p>>I was born and raised in Los Angeles, California. </p>
+        <h1>About me</h1>
         
-        <p>>I study Applied Math and Computer Science at Harvard. In high school I spent my days working on aerospace projects and math modeling research. I've worked as a software lead and principal scientist at NASA for the past 4 years.</p>
-        
-        <p>I'm passionate about a wide variety of industries and subjects, from habitable exoplanets to the startup space.</p>
-                        
-        <div class="contact-section">
-            <div class="contact-label">CONTACT</div>
-            <div class="contact-item">
-                <a href="mailto:bchang@college.harvard.edu">bchang@college.harvard.edu</a>
-            </div>
-            <div class="contact-item">
-                <a href="mailto:bran100607@gmail.com">bran100607@gmail.com</a>
-            </div>
-            <div class="contact-item">
-                <span class="icon">⊙</span>
-                <a href="https://github.com">GitHub</a>
-            </div>
-            <div class="contact-item">
-                <span class="icon">in</span>
-                <a href="https://www.linkedin.com/in/brandon-chang-3aa592239/">LinkedIn</a>
+        <div class="content-box">
+            <p>I am originally from Australia. I moved to the United States because I wanted to be around higher talent density and crystallised ambition.</p>
+            
+            <p>I study Computer Science and Engineering Sciences at Harvard. I have been programming since seventh grade; in high school I spent a lot of time on physics competitions and research. At 18, I received a quantitative trading internship at Optiver.</p>
+            
+            <p>I'm interested in a lot of things, from markets to every permutation of engineering (software <-> hardware).</p>
+            
+            <p>I care most about <u>building</u> where physical systems and frontier software meet.</p>
+            
+            <p>I am currently optimising for learning, for how best to build with people and teams I admire, and for problems worth solving.</p>
+            
+            <p>I like <u>reading</u> and <u>music</u>.</p>
+            
+            <div class="contact-section">
+                <div class="contact-label">CONTACT</div>
+                <div class="contact-item">
+                    <a href="mailto:bchang@college.harvard.edu">bchang@college.harvard.edu</a>
+                </div>
+                <div class="contact-item">
+                    <a href="mailto:bran100607@gmail.com">bran100607@gmail.com</a>
+                </div>
+                <div class="contact-item">
+                    <span class="icon">⊙</span>
+                    <a href="https://github.com">GitHub</a>
+                </div>
+                <div class="contact-item">
+                    <span class="icon">in</span>
+                    <a href="https://www.linkedin.com/in/brandon-chang-3aa592239/">LinkedIn</a>
+                </div>
             </div>
         </div>
     </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d', { alpha: true });
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        // Node data - interests
+        const interests = [
+            'Building', 'Systems', 'Software', 'Hardware', 'Markets',
+            'Physics', 'Research', 'Trading', 'Machine Learning', 'Design',
+            'Music', 'Reading', 'Innovation', 'Optimization', 'Engineering',
+            'Startups', 'Problem Solving', 'Data Science', 'Robotics', 'AI'
+        ];
+        
+        // Create nodes with random positions
+        let nodes = interests.map((name, idx) => ({
+            name,
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            vx: (Math.random() - 0.5) * 2,
+            vy: (Math.random() - 0.5) * 2,
+            radius: 6,
+            fixed: false
+        }));
+        
+        // Create connections between nodes
+        const connections = [];
+        nodes.forEach((node, i) => {
+            const connectionCount = 2 + Math.floor(Math.random() * 2);
+            for (let j = 0; j < connectionCount; j++) {
+                const targetIdx = Math.floor(Math.random() * nodes.length);
+                if (targetIdx !== i && !connections.some(c => (c[0] === i && c[1] === targetIdx) || (c[0] === targetIdx && c[1] === i))) {
+                    connections.push([i, targetIdx]);
+                }
+            }
+        });
+        
+        let draggedNode = null;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+        
+        // Mouse events
+        document.addEventListener('mousedown', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            for (let node of nodes) {
+                const dist = Math.hypot(node.x - x, node.y - y);
+                if (dist < node.radius + 15) {
+                    draggedNode = node;
+                    dragOffsetX = x - node.x;
+                    dragOffsetY = y - node.y;
+                    node.fixed = true;
+                    e.preventDefault();
+                    break;
+                }
+            }
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+            if (draggedNode) {
+                const rect = canvas.getBoundingClientRect();
+                draggedNode.x = e.clientX - rect.left - dragOffsetX;
+                draggedNode.y = e.clientY - rect.top - dragOffsetY;
+            }
+        });
+        
+        document.addEventListener('mouseup', () => {
+            if (draggedNode) {
+                draggedNode.fixed = false;
+                draggedNode = null;
+            }
+        });
+        
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+        
+        // Draw dotted background pattern
+        function drawBackground() {
+            ctx.fillStyle = '#f5f5f0';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = 'rgba(200, 200, 200, 0.3)';
+            const dotSize = 2;
+            const spacing = 30;
+            for (let x = 0; x < canvas.width; x += spacing) {
+                for (let y = 0; y < canvas.height; y += spacing) {
+                    ctx.fillRect(x, y, dotSize, dotSize);
+                }
+            }
+        }
+        
+        // Physics simulation
+        function update() {
+            nodes.forEach(node => {
+                // Repulsion between nodes
+                nodes.forEach(other => {
+                    if (node === other) return;
+                    
+                    const dx = node.x - other.x;
+                    const dy = node.y - other.y;
+                    const dist = Math.max(Math.hypot(dx, dy), 1);
+                    const force = 30000 / (dist * dist);
+                    
+                    node.vx += (dx / dist) * force * 0.001;
+                    node.vy += (dy / dist) * force * 0.001;
+                });
+                
+                // Damping
+                node.vx *= 0.92;
+                node.vy *= 0.92;
+                
+                // Update position if not dragged
+                if (!node.fixed) {
+                    node.x += node.vx;
+                    node.y += node.vy;
+                    
+                    // Boundary wrapping
+                    if (node.x < 0) node.x = canvas.width;
+                    if (node.x > canvas.width) node.x = 0;
+                    if (node.y < 0) node.y = canvas.height;
+                    if (node.y > canvas.height) node.y = 0;
+                }
+            });
+        }
+        
+        // Draw functions
+        function drawConnections() {
+            ctx.strokeStyle = 'rgba(150, 150, 150, 0.2)';
+            ctx.lineWidth = 1;
+            
+            connections.forEach(([fromIdx, toIdx]) => {
+                const from = nodes[fromIdx];
+                const to = nodes[toIdx];
+                ctx.beginPath();
+                ctx.moveTo(from.x, from.y);
+                ctx.lineTo(to.x, to.y);
+                ctx.stroke();
+            });
+        }
+        
+        function drawNodes() {
+            nodes.forEach(node => {
+                ctx.fillStyle = node.fixed ? 'rgba(0, 0, 0, 0.9)' : 'rgba(100, 100, 100, 0.6)';
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+        
+        function drawLabels() {
+            ctx.fillStyle = 'rgba(100, 100, 100, 0.5)';
+            ctx.font = '10px Courier New';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            
+            nodes.forEach(node => {
+                ctx.fillText(node.name, node.x, node.y + 12);
+            });
+        }
+        
+        // Animation loop
+        function animate() {
+            drawBackground();
+            update();
+            drawConnections();
+            drawNodes();
+            drawLabels();
+            
+            requestAnimationFrame(animate);
+        }
+        
+        animate();
+    </script>
 </body>
 </html>

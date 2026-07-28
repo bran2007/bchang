@@ -136,7 +136,6 @@
             }
         }
         
-        /* Node preview card */
         .node-preview {
             position: fixed;
             z-index: 20;
@@ -226,11 +225,10 @@
         <h1>About me</h1>
         
         <div class="content-box">
-        <h>>Hi! My name is Brandon. </h>   
-     <p>>I was born and raised in Los Angeles, California. </p>
-        <p>>I study Applied Math and Computer Science at Harvard. In high school I spent my days working on aerospace projects and math modeling research. I've worked as a software lead and principal scientist at NASA for the past 4 years.</p>
-
-        <p>>I'm passionate about a wide variety of industries and subjects, from habitable exoplanets to the startup space.</p>            
+            <h>>Hi! My name is Brandon. </h>   
+            <p>>I was born and raised in Los Angeles, California. </p>
+            <p>>I study Applied Math and Computer Science at Harvard. In high school I spent my days working on aerospace projects and math modeling research. I've worked as a software lead and principal scientist at NASA for the past 4 years.</p>
+            <p>>I'm passionate about a wide variety of industries and subjects, from habitable exoplanets to the startup space.</p>            
             <div class="contact-section">
                 <div class="contact-label">CONTACT</div>
                 <div class="contact-item">
@@ -258,7 +256,6 @@
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         
-        // Node data - each of these becomes its own page
         const interests = [
             'Artificial Intelligence',
             'Math Modeling',
@@ -274,8 +271,6 @@
             'Engineering'
         ];
         
-        // Short preview blurb + destination page for each node.
-        // Edit the "excerpt" text and "slug" filename as your real pages come together.
         const previews = {
             'Artificial Intelligence': { excerpt: 'Notes on models, agents, and where the field is actually headed versus the hype.', slug: 'artificial-intelligence' },
             'Math Modeling': { excerpt: 'Competition writeups and the modeling frameworks I keep coming back to.', slug: 'math-modeling' },
@@ -291,7 +286,6 @@
             'Engineering': { excerpt: 'Hardware and software builds, from prototypes to shipped systems.', slug: 'engineering' }
         };
         
-        // Create nodes with random positions
         let nodes = interests.map((name) => ({
             name,
             x: Math.random() * canvas.width,
@@ -301,13 +295,11 @@
             radius: 6,
             fixed: false,
             selected: false,
-            // per-node wandering signature, so the floating motion doesn't look synced/robotic
             driftPhase: Math.random() * Math.PI * 2,
             driftSpeed: 0.12 + Math.random() * 0.22,
             driftStrength: 0.02 + Math.random() * 0.02
         }));
         
-        // Create connections between nodes
         const connections = [];
         nodes.forEach((node, i) => {
             const connectionCount = 2 + Math.floor(Math.random() * 2);
@@ -329,7 +321,7 @@
         
         let selectedNode = null;
         let previewEl = null;
-        let previewAnchor = null; // { x, y } point on the box edge closest to the node, for the connector line
+        let previewAnchor = null;
         
         const CLICK_MOVE_THRESHOLD = 5;
         const PREVIEW_WIDTH = 180;
@@ -385,7 +377,6 @@
                 deselectNode();
             });
             previewEl.addEventListener('mousedown', (e) => {
-                // don't let clicks inside the card get treated as canvas clicks
                 e.stopPropagation();
             });
             
@@ -428,10 +419,9 @@
             }
         }
         
-        // Mouse events
         document.addEventListener('mousedown', (e) => {
             if (e.target.closest && e.target.closest('.node-preview')) {
-                return; // clicks inside the preview card are handled by its own listeners
+                return;
             }
             
             const rect = canvas.getBoundingClientRect();
@@ -483,10 +473,8 @@
         document.addEventListener('mouseup', () => {
             if (draggedNode) {
                 if (!dragMoved) {
-                    // a genuine click (no meaningful movement) - toggle selection + preview card
                     toggleNode(draggedNode);
                 } else if (!draggedNode.selected) {
-                    // was just a drag, not a selection - let it resume floating
                     draggedNode.fixed = false;
                 }
                 draggedNode = null;
@@ -501,7 +489,6 @@
             }
         });
         
-        // Draw dotted background pattern
         function drawBackground() {
             ctx.fillStyle = '#f5f5f0';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -516,13 +503,10 @@
             }
         }
         
-        // Physics simulation
         function update() {
             time += 0.016;
             
             nodes.forEach(node => {
-                // Repulsion between nodes (applies to and from locked/selected nodes too,
-                // so everything else still moves naturally around a locked node)
                 nodes.forEach(other => {
                     if (node === other) return;
                     
@@ -535,16 +519,12 @@
                     node.vy += (dy / dist) * force * 0.001;
                 });
                 
-                // Gentle floating drift - a slow, unique wander per node,
-                // so nodes never fully settle even without any interaction
                 node.vx += Math.sin(time * node.driftSpeed + node.driftPhase) * node.driftStrength;
                 node.vy += Math.cos(time * node.driftSpeed * 0.8 + node.driftPhase) * node.driftStrength;
                 
-                // Lighter damping = velocity carries further = more visible inertia
                 node.vx *= 0.985;
                 node.vy *= 0.985;
                 
-                // Cap speed so momentum stays visible but doesn't run away
                 const speed = Math.hypot(node.vx, node.vy);
                 const maxSpeed = 1.6;
                 if (speed > maxSpeed) {
@@ -552,35 +532,32 @@
                     node.vy = (node.vy / speed) * maxSpeed;
                 }
                 
-                // Update position if not dragged and not locked/selected
                 if (!node.fixed) {
                     node.x += node.vx;
                     node.y += node.vy;
                     
-                    // Soft bounce off edges instead of teleport-wrapping.
-                    // Wrapping caused a glitch: a node jumping from one edge
-                    // to the other made its lines snap across the whole screen
-                    // for a frame. Bouncing keeps motion continuous.
                     const margin = node.radius + 10;
+                    const damping = 1;
+                    
                     if (node.x < margin) {
                         node.x = margin;
-                        node.vx = Math.abs(node.vx) * 0.6;
+                        node.vx = Math.abs(node.vx) * damping;
                     } else if (node.x > canvas.width - margin) {
                         node.x = canvas.width - margin;
-                        node.vx = -Math.abs(node.vx) * 0.6;
+                        node.vx = -Math.abs(node.vx) * damping;
                     }
+                    
                     if (node.y < margin) {
                         node.y = margin;
-                        node.vy = Math.abs(node.vy) * 0.6;
+                        node.vy = Math.abs(node.vy) * damping;
                     } else if (node.y > canvas.height - margin) {
                         node.y = canvas.height - margin;
-                        node.vy = -Math.abs(node.vy) * 0.6;
+                        node.vy = -Math.abs(node.vy) * damping;
                     }
                 }
             });
         }
         
-        // Draw functions
         function drawConnections() {
             ctx.strokeStyle = 'rgba(150, 150, 150, 0.2)';
             ctx.lineWidth = 1;
@@ -612,7 +589,6 @@
         function drawNodes() {
             nodes.forEach(node => {
                 if (node.selected) {
-                    // highlight ring around the locked/selected node
                     ctx.strokeStyle = 'rgba(26, 26, 26, 0.5)';
                     ctx.lineWidth = 1.5;
                     ctx.beginPath();
@@ -638,7 +614,6 @@
             });
         }
         
-        // Animation loop
         function animate() {
             drawBackground();
             update();

@@ -135,6 +135,84 @@
                 font-size: 24px;
             }
         }
+        
+        /* Node preview card */
+        .node-preview {
+            position: fixed;
+            z-index: 20;
+            width: 180px;
+            height: 270px;
+            background-color: #fdfdfa;
+            border: 2px solid #1a1a1a;
+            border-radius: 14px;
+            box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.12);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Courier New', Courier, monospace;
+            animation: previewIn 0.18s ease-out;
+            pointer-events: auto;
+        }
+        
+        @keyframes previewIn {
+            from {
+                opacity: 0;
+                transform: scale(0.92);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .preview-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .preview-title {
+            font-family: 'Times New Roman', serif;
+            font-size: 16px;
+            line-height: 1.25;
+            padding-right: 8px;
+        }
+        
+        .preview-close {
+            cursor: pointer;
+            font-size: 16px;
+            line-height: 1;
+            color: #888;
+            flex-shrink: 0;
+        }
+        
+        .preview-close:hover {
+            color: #1a1a1a;
+        }
+        
+        .preview-content {
+            font-size: 12px;
+            line-height: 1.6;
+            color: #444;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+        
+        .preview-link {
+            font-size: 12px;
+            color: #1a1a1a;
+            text-decoration: none;
+            border-bottom: 1px solid #1a1a1a;
+            align-self: flex-start;
+            margin-top: 10px;
+        }
+        
+        .preview-link:hover {
+            opacity: 0.6;
+        }
     </style>
 </head>
 <body>
@@ -187,23 +265,53 @@
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         
-        // Node data - interests
+        // Node data - each of these becomes its own page
         const interests = [
-            'Building', 'Systems', 'Software', 'Hardware', 'Markets',
-            'Physics', 'Research', 'Trading', 'Machine Learning', 'Design',
-            'Music', 'Reading', 'Innovation', 'Optimization', 'Engineering',
-            'Startups', 'Problem Solving', 'Data Science', 'Robotics', 'AI'
+            'Artificial Intelligence',
+            'Math Modeling',
+            'Aerospace',
+            'Startups',
+            'Journalism',
+            'Social Advocacy',
+            'Research',
+            'Reading',
+            'Science Communication',
+            'Machine Learning',
+            'Quantitative Finance',
+            'Engineering'
         ];
         
+        // Short preview blurb + destination page for each node.
+        // Edit the "excerpt" text and "slug" filename as your real pages come together.
+        const previews = {
+            'Artificial Intelligence': { excerpt: 'Notes on models, agents, and where the field is actually headed versus the hype.', slug: 'artificial-intelligence' },
+            'Math Modeling': { excerpt: 'Competition writeups and the modeling frameworks I keep coming back to.', slug: 'math-modeling' },
+            'Aerospace': { excerpt: 'Projects and reading at the intersection of propulsion, structures, and flight.', slug: 'aerospace' },
+            'Startups': { excerpt: 'What I have built, what I am building, and lessons from founders I admire.', slug: 'startups' },
+            'Journalism': { excerpt: 'Pieces I have written and how I think about reporting on technical topics.', slug: 'journalism' },
+            'Social Advocacy': { excerpt: 'Causes I care about and the work I have done to move them forward.', slug: 'social-advocacy' },
+            'Research': { excerpt: 'Ongoing and past research, mostly at the physics-meets-computation boundary.', slug: 'research' },
+            'Reading': { excerpt: 'A running log of books and essays worth your time.', slug: 'reading' },
+            'Science Communication': { excerpt: 'Explaining hard ideas clearly, for people outside the field.', slug: 'science-communication' },
+            'Machine Learning': { excerpt: 'Papers, implementations, and experiments I have worked through.', slug: 'machine-learning' },
+            'Quantitative Finance': { excerpt: 'What I learned trading at Optiver and how markets shape the way I think.', slug: 'quantitative-finance' },
+            'Engineering': { excerpt: 'Hardware and software builds, from prototypes to shipped systems.', slug: 'engineering' }
+        };
+        
         // Create nodes with random positions
-        let nodes = interests.map((name, idx) => ({
+        let nodes = interests.map((name) => ({
             name,
             x: Math.random() * canvas.width,
             y: Math.random() * canvas.height,
             vx: (Math.random() - 0.5) * 2,
             vy: (Math.random() - 0.5) * 2,
             radius: 6,
-            fixed: false
+            fixed: false,
+            selected: false,
+            // per-node wandering signature, so the floating motion doesn't look synced/robotic
+            driftPhase: Math.random() * Math.PI * 2,
+            driftSpeed: 0.12 + Math.random() * 0.22,
+            driftStrength: 0.02 + Math.random() * 0.02
         }));
         
         // Create connections between nodes
@@ -221,37 +329,173 @@
         let draggedNode = null;
         let dragOffsetX = 0;
         let dragOffsetY = 0;
+        let mouseDownX = 0;
+        let mouseDownY = 0;
+        let dragMoved = false;
+        let time = 0;
+        
+        let selectedNode = null;
+        let previewEl = null;
+        let previewAnchor = null; // { x, y } point on the box edge closest to the node, for the connector line
+        
+        const CLICK_MOVE_THRESHOLD = 5;
+        const PREVIEW_WIDTH = 180;
+        const PREVIEW_HEIGHT = 270;
+        const PREVIEW_GAP = 22;
+        
+        function slugify(node) {
+            return (previews[node.name] && previews[node.name].slug) || node.name.toLowerCase().replace(/\s+/g, '-');
+        }
+        
+        function positionPreview(node) {
+            if (!previewEl) return;
+            
+            const margin = 16;
+            const placeRight = node.x + PREVIEW_GAP + PREVIEW_WIDTH <= window.innerWidth - margin;
+            
+            const left = placeRight
+                ? node.x + PREVIEW_GAP
+                : Math.max(margin, node.x - PREVIEW_GAP - PREVIEW_WIDTH);
+            
+            let top = node.y - PREVIEW_HEIGHT / 2;
+            top = Math.min(Math.max(top, margin), window.innerHeight - PREVIEW_HEIGHT - margin);
+            
+            previewEl.style.left = `${left}px`;
+            previewEl.style.top = `${top}px`;
+            
+            previewAnchor = {
+                x: placeRight ? left : left + PREVIEW_WIDTH,
+                y: top + PREVIEW_HEIGHT / 2
+            };
+        }
+        
+        function showPreview(node) {
+            const data = previews[node.name] || { excerpt: '', slug: slugify(node) };
+            
+            previewEl = document.createElement('div');
+            previewEl.className = 'node-preview';
+            previewEl.innerHTML = `
+                <div class="preview-header">
+                    <span class="preview-title">${node.name}</span>
+                    <span class="preview-close" aria-label="close">&times;</span>
+                </div>
+                <div class="preview-content">${data.excerpt}</div>
+                <a class="preview-link" href="${data.slug}.html">Open page →</a>
+            `;
+            document.body.appendChild(previewEl);
+            
+            previewEl.querySelector('.preview-close').addEventListener('mousedown', (e) => {
+                e.stopPropagation();
+            });
+            previewEl.querySelector('.preview-close').addEventListener('click', (e) => {
+                e.stopPropagation();
+                deselectNode();
+            });
+            previewEl.addEventListener('mousedown', (e) => {
+                // don't let clicks inside the card get treated as canvas clicks
+                e.stopPropagation();
+            });
+            
+            positionPreview(node);
+        }
+        
+        function removePreview() {
+            if (previewEl) {
+                previewEl.remove();
+                previewEl = null;
+            }
+            previewAnchor = null;
+        }
+        
+        function selectNode(node) {
+            if (selectedNode) {
+                selectedNode.selected = false;
+                selectedNode.fixed = false;
+                removePreview();
+            }
+            node.selected = true;
+            node.fixed = true;
+            selectedNode = node;
+            showPreview(node);
+        }
+        
+        function deselectNode() {
+            if (!selectedNode) return;
+            selectedNode.selected = false;
+            selectedNode.fixed = false;
+            selectedNode = null;
+            removePreview();
+        }
+        
+        function toggleNode(node) {
+            if (selectedNode === node) {
+                deselectNode();
+            } else {
+                selectNode(node);
+            }
+        }
         
         // Mouse events
         document.addEventListener('mousedown', (e) => {
+            if (e.target.closest && e.target.closest('.node-preview')) {
+                return; // clicks inside the preview card are handled by its own listeners
+            }
+            
             const rect = canvas.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
             
+            let hit = null;
             for (let node of nodes) {
                 const dist = Math.hypot(node.x - x, node.y - y);
                 if (dist < node.radius + 15) {
-                    draggedNode = node;
-                    dragOffsetX = x - node.x;
-                    dragOffsetY = y - node.y;
-                    node.fixed = true;
-                    e.preventDefault();
+                    hit = node;
                     break;
                 }
+            }
+            
+            if (hit) {
+                draggedNode = hit;
+                dragOffsetX = x - hit.x;
+                dragOffsetY = y - hit.y;
+                mouseDownX = x;
+                mouseDownY = y;
+                dragMoved = false;
+                hit.fixed = true;
+                e.preventDefault();
+            } else if (selectedNode) {
+                deselectNode();
             }
         });
         
         document.addEventListener('mousemove', (e) => {
             if (draggedNode) {
                 const rect = canvas.getBoundingClientRect();
-                draggedNode.x = e.clientX - rect.left - dragOffsetX;
-                draggedNode.y = e.clientY - rect.top - dragOffsetY;
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                if (Math.hypot(x - mouseDownX, y - mouseDownY) > CLICK_MOVE_THRESHOLD) {
+                    dragMoved = true;
+                }
+                
+                draggedNode.x = x - dragOffsetX;
+                draggedNode.y = y - dragOffsetY;
+                
+                if (draggedNode.selected) {
+                    positionPreview(draggedNode);
+                }
             }
         });
         
         document.addEventListener('mouseup', () => {
             if (draggedNode) {
-                draggedNode.fixed = false;
+                if (!dragMoved) {
+                    // a genuine click (no meaningful movement) - toggle selection + preview card
+                    toggleNode(draggedNode);
+                } else if (!draggedNode.selected) {
+                    // was just a drag, not a selection - let it resume floating
+                    draggedNode.fixed = false;
+                }
                 draggedNode = null;
             }
         });
@@ -259,6 +503,9 @@
         window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
+            if (selectedNode) {
+                positionPreview(selectedNode);
+            }
         });
         
         // Draw dotted background pattern
@@ -278,8 +525,11 @@
         
         // Physics simulation
         function update() {
+            time += 0.016;
+            
             nodes.forEach(node => {
-                // Repulsion between nodes
+                // Repulsion between nodes (applies to and from locked/selected nodes too,
+                // so everything else still moves naturally around a locked node)
                 nodes.forEach(other => {
                     if (node === other) return;
                     
@@ -292,20 +542,47 @@
                     node.vy += (dy / dist) * force * 0.001;
                 });
                 
-                // Damping
-                node.vx *= 0.92;
-                node.vy *= 0.92;
+                // Gentle floating drift - a slow, unique wander per node,
+                // so nodes never fully settle even without any interaction
+                node.vx += Math.sin(time * node.driftSpeed + node.driftPhase) * node.driftStrength;
+                node.vy += Math.cos(time * node.driftSpeed * 0.8 + node.driftPhase) * node.driftStrength;
                 
-                // Update position if not dragged
+                // Lighter damping = velocity carries further = more visible inertia
+                node.vx *= 0.985;
+                node.vy *= 0.985;
+                
+                // Cap speed so momentum stays visible but doesn't run away
+                const speed = Math.hypot(node.vx, node.vy);
+                const maxSpeed = 1.6;
+                if (speed > maxSpeed) {
+                    node.vx = (node.vx / speed) * maxSpeed;
+                    node.vy = (node.vy / speed) * maxSpeed;
+                }
+                
+                // Update position if not dragged and not locked/selected
                 if (!node.fixed) {
                     node.x += node.vx;
                     node.y += node.vy;
                     
-                    // Boundary wrapping
-                    if (node.x < 0) node.x = canvas.width;
-                    if (node.x > canvas.width) node.x = 0;
-                    if (node.y < 0) node.y = canvas.height;
-                    if (node.y > canvas.height) node.y = 0;
+                    // Soft bounce off edges instead of teleport-wrapping.
+                    // Wrapping caused a glitch: a node jumping from one edge
+                    // to the other made its lines snap across the whole screen
+                    // for a frame. Bouncing keeps motion continuous.
+                    const margin = node.radius + 10;
+                    if (node.x < margin) {
+                        node.x = margin;
+                        node.vx = Math.abs(node.vx) * 0.6;
+                    } else if (node.x > canvas.width - margin) {
+                        node.x = canvas.width - margin;
+                        node.vx = -Math.abs(node.vx) * 0.6;
+                    }
+                    if (node.y < margin) {
+                        node.y = margin;
+                        node.vy = Math.abs(node.vy) * 0.6;
+                    } else if (node.y > canvas.height - margin) {
+                        node.y = canvas.height - margin;
+                        node.vy = -Math.abs(node.vy) * 0.6;
+                    }
                 }
             });
         }
@@ -325,8 +602,31 @@
             });
         }
         
+        function drawPreviewConnector() {
+            if (!selectedNode || !previewAnchor) return;
+            
+            ctx.save();
+            ctx.strokeStyle = 'rgba(26, 26, 26, 0.4)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(selectedNode.x, selectedNode.y);
+            ctx.lineTo(previewAnchor.x, previewAnchor.y);
+            ctx.stroke();
+            ctx.restore();
+        }
+        
         function drawNodes() {
             nodes.forEach(node => {
+                if (node.selected) {
+                    // highlight ring around the locked/selected node
+                    ctx.strokeStyle = 'rgba(26, 26, 26, 0.5)';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, node.radius + 6, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+                
                 ctx.fillStyle = node.fixed ? 'rgba(0, 0, 0, 0.9)' : 'rgba(100, 100, 100, 0.6)';
                 ctx.beginPath();
                 ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
@@ -335,12 +635,12 @@
         }
         
         function drawLabels() {
-            ctx.fillStyle = 'rgba(100, 100, 100, 0.5)';
             ctx.font = '10px Courier New';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'top';
             
             nodes.forEach(node => {
+                ctx.fillStyle = node.selected ? 'rgba(26, 26, 26, 0.85)' : 'rgba(100, 100, 100, 0.5)';
                 ctx.fillText(node.name, node.x, node.y + 12);
             });
         }
@@ -350,6 +650,7 @@
             drawBackground();
             update();
             drawConnections();
+            drawPreviewConnector();
             drawNodes();
             drawLabels();
             

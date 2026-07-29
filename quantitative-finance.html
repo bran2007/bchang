@@ -1,1 +1,221 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CUSTOMIZE: page title -->
+    <title>Quantitative Finance - Brandon Chang</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+            line-height: 1.6;
+            background-color: #f5f5f0;
+            color: #1a1a1a;
+            overflow-x: hidden;
+        }
+        
+        /* static dotted background, matching the rest of the site without
+           the animated nodes - keeps a content page calm and readable */
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            display: block;
+            pointer-events: none;
+        }
+        
+        .content-wrapper {
+            position: relative;
+            z-index: 2;
+            padding: 60px 40px;
+            max-width: 900px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+        
+        .back-link {
+            margin-bottom: 40px;
+            font-size: 15px;
+        }
+        
+        .back-link a {
+            color: #1a1a1a;
+            text-decoration: none;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        
+        .back-link a:hover {
+            opacity: 0.6;
+        }
+        
+        h1 {
+            font-size: 32px;
+            font-weight: 400;
+            margin-bottom: 10px;
+            font-family: 'Times New Roman', serif;
+        }
+        
+        .page-subtitle {
+            font-size: 14px;
+            color: #666;
+            letter-spacing: 0.5px;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+        
+        .content-box {
+            border: 2px dashed #333;
+            padding: 40px;
+            margin-bottom: 40px;
+            line-height: 1.8;
+            background-color: rgba(245, 245, 240, 0.95);
+        }
+        
+        .content-box p {
+            margin-bottom: 20px;
+            font-size: 15px;
+        }
+        
+        .content-box p:last-child {
+            margin-bottom: 0;
+        }
+        
+        u {
+            text-decoration: underline;
+        }
+        
+        /* Image block: rounded corners, thin border, caption underneath.
+           Duplicate the <figure> markup below for each image. */
+        .image-block {
+            margin: 35px 0;
+        }
+        
+        .image-block img {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+            border: 2px solid #1a1a1a;
+        }
+        
+        .image-block figcaption {
+            margin-top: 10px;
+            font-size: 13px;
+            font-style: italic;
+            color: #666;
+            text-align: center;
+        }
+        
+        /* optional: side-by-side pair of images on wider screens */
+        .image-row {
+            display: flex;
+            gap: 20px;
+            margin: 35px 0;
+        }
+        
+        .image-row .image-block {
+            margin: 0;
+            flex: 1;
+        }
+        
+        @media (max-width: 600px) {
+            .content-wrapper {
+                padding: 40px 20px;
+            }
+            
+            .content-box {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 26px;
+            }
+            
+            .image-row {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    
+    <div class="content-wrapper">
+        <div class="back-link">
+            <a href="about.html">← back</a>
+        </div>
+        
+        <!-- CUSTOMIZE: main title -->
+        <h1>Quantitative Finance</h1>
+        <!-- CUSTOMIZE: optional one-line subtitle, delete this div if you don't want one -->
+        <p class="page-subtitle">Markets, models, and what four years at Optiver taught me.</p>
+        
+        <div class="content-box">
+            <!-- CUSTOMIZE: replace with real copy. Paragraphs below are placeholder lorem ipsum. -->
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+            
+            <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            
+            <!-- IMAGE OPTION 1: single full-width image -->
+            <figure class="image-block">
+                <img src="https://placehold.co/800x450/f5f5f0/1a1a1a?text=Image" alt="Description of the image">
+                <figcaption>Caption goes here — describe what's shown, or credit a source.</figcaption>
+            </figure>
+            
+            <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+            
+            <!-- IMAGE OPTION 2: two images side by side (remove this block if not needed) -->
+            <div class="image-row">
+                <figure class="image-block">
+                    <img src="https://placehold.co/400x300/f5f5f0/1a1a1a?text=Image+A" alt="Description of image A">
+                    <figcaption>Caption for image A.</figcaption>
+                </figure>
+                <figure class="image-block">
+                    <img src="https://placehold.co/400x300/f5f5f0/1a1a1a?text=Image+B" alt="Description of image B">
+                    <figcaption>Caption for image B.</figcaption>
+                </figure>
+            </div>
+            
+            <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet.</p>
+        </div>
+    </div>
+    
+    <script>
+        // Static dotted background - same pattern as the rest of the site,
+        // just without the floating node animation, so it stays calm on a
+        // page meant for reading.
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d', { alpha: true });
+        
+        function drawBackground() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            ctx.fillStyle = '#f5f5f0';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = 'rgba(200, 200, 200, 0.3)';
+            const dotSize = 2;
+            const spacing = 30;
+            for (let x = 0; x < canvas.width; x += spacing) {
+                for (let y = 0; y < canvas.height; y += spacing) {
+                    ctx.fillRect(x, y, dotSize, dotSize);
+                }
+            }
+        }
+        
+        drawBackground();
+        window.addEventListener('resize', drawBackground);
+    </script>
+</body>
+</html>

@@ -122,6 +122,46 @@
             font-size: 14px;
         }
         
+        .pages-section {
+            border-top: 2px dashed #888;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+        
+        .pages-label {
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 15px;
+        }
+        
+        .pages-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .page-button {
+            display: inline-block;
+            padding: 8px 14px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            color: #1a1a1a;
+            text-decoration: none;
+            border: 1px solid #1a1a1a;
+            border-radius: 20px;
+            background-color: rgba(245, 245, 240, 0.6);
+            transition: background-color 0.15s ease, transform 0.15s ease;
+        }
+        
+        .page-button:hover {
+            background-color: #1a1a1a;
+            color: #f5f5f0;
+        }
+        
+        .page-button:before {
+            content: "> ";
+        }
+        
         @media (max-width: 600px) {
             .content-wrapper {
                 padding: 40px 20px;
@@ -245,6 +285,24 @@
                 <div class="contact-item">
                     <span class="icon">in</span>
                     <a href="https://www.linkedin.com/in/brandon-chang-3aa592239/">LinkedIn</a>
+                </div>
+            </div>
+
+            <div class="pages-section">
+                <div class="pages-label">ALL PAGES</div>
+                <div class="pages-grid">
+                    <a class="page-button" href="artificial-intelligence.html" data-node="Artificial Intelligence">Artificial Intelligence</a>
+                    <a class="page-button" href="math-modeling.html" data-node="Math Modeling">Math Modeling</a>
+                    <a class="page-button" href="aerospace.html" data-node="Aerospace">Aerospace</a>
+                    <a class="page-button" href="startups.html" data-node="Startups">Startups</a>
+                    <a class="page-button" href="journalism.html" data-node="Journalism">Journalism</a>
+                    <a class="page-button" href="social-advocacy.html" data-node="Social Advocacy">Social Advocacy</a>
+                    <a class="page-button" href="research.html" data-node="Research">Research</a>
+                    <a class="page-button" href="reading.html" data-node="Reading">Reading</a>
+                    <a class="page-button" href="science-communication.html" data-node="Science Communication">Science Communication</a>
+                    <a class="page-button" href="side-projects.html" data-node="Side Projects">Side Projects</a>
+                    <a class="page-button" href="quantitative-finance.html" data-node="Quantitative Finance">Quantitative Finance</a>
+                    <a class="page-button" href="engineering.html" data-node="Engineering">Engineering</a>
                 </div>
             </div>
         </div>
@@ -491,6 +549,17 @@
             if (selectedNode) {
                 positionPreview(selectedNode);
             }
+        });
+        
+        document.querySelectorAll('.page-button').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const name = btn.getAttribute('data-node');
+                const node = nodes.find(n => n.name === name);
+                if (node) {
+                    toggleNode(node);
+                }
+            });
         });
         
         function drawBackground() {

@@ -1,1 +1,224 @@
-<p>AI</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI - Brandon Chang</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+            line-height: 1.6;
+            background-color: #f5f5f0;
+            color: #1a1a1a;
+            overflow-x: hidden;
+        }
+
+        /* Static dotted background */
+        #canvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 2;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 60px 40px;
+            min-height: 100vh;
+        }
+
+        .back-link {
+            margin-bottom: 40px;
+            font-size: 15px;
+        }
+
+        .back-link a {
+            color: #1a1a1a;
+            text-decoration: none;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        .back-link a:hover {
+            opacity: 0.6;
+        }
+
+        h1 {
+            font-family: "Times New Roman", serif;
+            font-size: 32px;
+            font-weight: 400;
+            margin-bottom: 10px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: #666;
+            font-style: italic;
+            letter-spacing: 0.5px;
+            margin-bottom: 30px;
+        }
+
+        .content-box {
+            border: 2px dashed #333;
+            background: rgba(245, 245, 240, 0.95);
+            padding: 40px;
+            line-height: 1.8;
+        }
+
+        .content-box p {
+            margin-bottom: 28px;
+            font-size: 15px;
+        }
+
+        .image-block {
+            margin: 40px 0;
+        }
+
+        .image-block img {
+            display: block;
+            width: 100%;
+            height: auto;
+            border: 2px solid #1a1a1a;
+            border-radius: 12px;
+        }
+
+        .image-block figcaption {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 13px;
+            font-style: italic;
+            color: #666;
+        }
+
+        .image-row {
+            display: flex;
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .image-row .image-block {
+            flex: 1;
+            margin: 0;
+        }
+
+        .image-row img {
+            width: 100%;
+            height: 320px;
+            object-fit: cover;
+        }
+
+        @media (max-width: 600px) {
+            .content-wrapper {
+                padding: 40px 20px;
+            }
+
+            .content-box {
+                padding: 20px;
+            }
+
+            .image-row {
+                flex-direction: column;
+            }
+
+            h1 {
+                font-size: 26px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<canvas id="canvas"></canvas>
+
+<div class="content-wrapper">
+
+    <div class="back-link">
+        <a href="about.html">← back</a>
+    </div>
+
+    <h1>Artificial Intelligence</h1>
+
+    <p class="page-subtitle">
+        My thesis on AI, where the industry is headed + concerns.
+    </p>
+
+    <div class="content-box">
+
+        <p>
+Artificial intelligence is shifting from a tool that generates information to decision-making infrastructure. This change will reshape labor, science, education, and governance, while creating new risks around concentration of power, truth, and human agency.  The defining question is not whether AI becomes more capable. It will. The harder question is whether our institutions, incentives, and values can keep pace. The next decade will be shaped as much by human decisions as by machine intelligence.        </p>
+
+        <!-- Large image -->
+            <figure class="image-block">
+                <img src="https://lh3.googleusercontent.com/d/1WGJ92Wl79x6UkxlwXszEZluVMT1VMUvg" alt="2024-25 Payload: SpectraSolis">
+                <figcaption>SpectraSolis -- solar imaging telescope (2024-25 HASP mission).</figcaption>
+            </figure>
+
+        <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer feugiat, lectus vitae faucibus pellentesque, lectus nunc malesuada lectus, sed porta sapien lorem eget erat. Suspendisse potenti. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec vitae augue sed ipsum volutpat aliquet.
+        </p>
+
+        <!-- Two medium images -->
+        <div class="image-row">
+
+            <figure class="image-block">
+                <img src="https://lh3.googleusercontent.com/d/1UpJpvo3l286WJ1EsFRuFEPIU4Kq28fCy" alt="2024-25 Payload: SpectraSolis">
+                <figcaption>SpectraSolis -- solar imaging telescope (2024-25 HASP mission).</figcaption>
+            </figure>
+
+            <figure class="image-block">
+                <img src="https://lh3.googleusercontent.com/d/1-S8LcMgpkRsrifbL8R8vBXy8qxKRgk-B" alt="2024-25 Payload: SpectraSolis">
+                <figcaption>SpectraSolis -- solar imaging telescope (2024-25 HASP mission).</figcaption>
+            </figure>
+
+        </div>
+
+        <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur eget nisl nec magna gravida scelerisque. Proin at purus vitae elit aliquet tincidunt. Vivamus luctus, velit non vulputate aliquet, tortor ligula malesuada velit, vel feugiat neque neque vitae urna. Morbi vel nisi sed justo cursus interdum ut vel odio. Donec vitae lorem ac lectus malesuada convallis. Integer fermentum, libero vitae feugiat convallis, ligula mauris efficitur sapien, eget faucibus nisl lacus non est.
+        </p>
+
+    </div>
+
+</div>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+function drawBackground() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    ctx.fillStyle = "#f5f5f0";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "rgba(200, 200, 200, 0.3)";
+
+    const spacing = 30;
+    const dotSize = 2;
+
+    for (let x = 0; x < canvas.width; x += spacing) {
+        for (let y = 0; y < canvas.height; y += spacing) {
+            ctx.fillRect(x, y, dotSize, dotSize);
+        }
+    }
+}
+
+drawBackground();
+window.addEventListener("resize", drawBackground);
+</script>
+
+</body>
+</html>
